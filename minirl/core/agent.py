@@ -3,24 +3,30 @@ from MiniRL.minirl.core.logic.run_logic import TrainLogic
 
 
 class Agent(Serialization):
-    def __init__(self, policy):
+    def __init__(self, policy, environment=None):
         self.policy = policy
+        self.env = environment
 
         self._logic = TrainLogic()
 
 
-    def learn(self, move_condition=None, fit_condition=None, verbose=True):
+    def learn(self, environment=None, move_condition=None, fit_condition=None, verbose=True):
+        if self.env is None and environment is not None:
+            self.env = environment
+        else:
+            raise RuntimeError("Environment is None")
+
         if move_condition is None:
             move_condition = self._logic.move_condition
         if fit_condition is None:
             fit_condition = self._logic.fit_condition
-            
-        self._run(move_condition=move_condition,
+
+        self._move(move_condition=move_condition,
                   fit_condition=fit_condition,
                   verbose=verbose)
         
 
-    def _run(self, move_condition, fit_condition, init_state=None, verbose=True):
+    def _move(self, move_condition, fit_condition, init_state=None, verbose=True):
         self._logic.init_run(init_state, verbose)
 
         rollout = []
@@ -42,7 +48,7 @@ class Agent(Serialization):
 
         
         self.stop()
-        # self.env.stop()
+        self.env.stop()
 
         return rollout
 

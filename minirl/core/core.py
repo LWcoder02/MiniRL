@@ -15,7 +15,8 @@ class Core():
         self._logic.init_learn(num_steps_per_fit, num_episodes_per_fit, num_steps, num_episodes)
 
 
-        dataset = self.agent.learn(verbose)
+        dataset = self.agent.learn(environment=self.environment,
+                                   verbose=verbose)
         return dataset
 
 
