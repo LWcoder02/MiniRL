@@ -21,10 +21,20 @@ class Agent(Serialization):
         if fit_condition is None:
             fit_condition = self._logic.fit_condition
 
-        self._move(move_condition=move_condition,
+        return self._move(move_condition=move_condition,
                   fit_condition=fit_condition,
                   verbose=verbose)
         
+
+    def evaluate(self, move_condition=None, initial_state=None, verbose=True):
+        if move_condition is None:
+            move_condition = self._logic.move_condition
+
+        fit_condition = lambda: False
+
+        return self._move(move_condition, fit_condition,
+                          initial_state, verbose=verbose)
+
 
     def _move(self, move_condition, fit_condition, init_state=None, verbose=True):
         self._logic.init_run(init_state, verbose)
@@ -34,17 +44,17 @@ class Agent(Serialization):
         terminal = True
         while move_condition():
             if terminal:
-                self._reset(init_state)
+                state = self._reset(init_state)
 
-            sample = self.step()
+            sample = self.step(state)
 
             if fit_condition():
                 self._train(rollout)
 
-
                 rollout.clear()
 
             terminal = sample[5]
+            state = sample[3]
 
         
         self.stop()
@@ -53,15 +63,11 @@ class Agent(Serialization):
         return rollout
 
 
-    def evaluate(self):
-        pass
-
-
     def _train(self):
-        pass
+        raise NotImplementedError("Train method is not implemented since Agent is an abstract class")
 
 
-    def draw_action(self):
+    def draw_action(self, state):
         pass
 
 
@@ -73,5 +79,11 @@ class Agent(Serialization):
         pass
 
 
-    def step(self):
-        pass
+    def step(self, state):
+        assert self.env is not None, "Cannot move, environment is None"
+
+        action = self.draw_action(state)
+        next_state, reward, absorbing, info = self.env.step(action)
+
+        last = False
+        return (state, action, reward, next_state, absorbing, last)
