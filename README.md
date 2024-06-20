@@ -1,1 +1,1 @@
-# MiniRL
+# MiniRL: A small Reinforcement Learning Framework inspired by Mushroom-RL
