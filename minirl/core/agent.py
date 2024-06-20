@@ -7,6 +7,8 @@ class Agent(Serialization):
         self.policy = policy
         self.env = environment
 
+        self._episode_steps = 0
+
         self._logic = TrainLogic()
 
 
@@ -66,11 +68,17 @@ class Agent(Serialization):
 
 
     def draw_action(self, state):
-        pass
+        return self.polcy.draw_action(state)
 
 
-    def _reset(self):
-        pass
+    def _reset(self, initial_state=None):
+        if initial_state is not None:
+            state = self.env.reset(initial_state)
+        else:
+            state = self.env.reset()
+
+
+        return state
 
 
     def step(self, state):
@@ -79,5 +87,7 @@ class Agent(Serialization):
         action = self.draw_action(state)
         next_state, reward, absorbing, info = self.env.step(action)
 
-        last = False
+        self._episode_steps += 1
+
+        last = self._episode_steps >= self.env.info.horizon or absorbing
         return (state, action, reward, next_state, absorbing, last)
