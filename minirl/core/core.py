@@ -20,10 +20,14 @@ class Core():
         return dataset
 
 
+    def evaluate(self, num_steps=None, num_episodes=None, initial_state=None, verbose=True):
+
+        self._logic.init_evaluate(num_steps, num_episodes)
+
+        dataset = self.agent.evaluate()
+        return dataset
+
+
     def _reset(self, initial_state=None):
         pass
 
-
-
-    def _step(self):
-        pass
