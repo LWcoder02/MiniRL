@@ -24,7 +24,7 @@ class Core():
 
         self._logic.init_evaluate(num_steps, num_episodes)
 
-        dataset = self.agent.evaluate()
+        dataset = self.agent.evaluate(initial_state=initial_state, verbose=verbose)
         return dataset
 
 

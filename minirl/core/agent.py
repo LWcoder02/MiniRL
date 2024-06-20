@@ -30,7 +30,7 @@ class Agent(Serialization):
         if move_condition is None:
             move_condition = self._logic.move_condition
 
-        fit_condition = lambda: False
+        fit_condition = self._logic.fit_condition
 
         return self._move(move_condition, fit_condition,
                           initial_state, verbose=verbose)
