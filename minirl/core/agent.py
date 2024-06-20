@@ -56,8 +56,6 @@ class Agent(Serialization):
             terminal = sample[5]
             state = sample[3]
 
-        
-        self.stop()
         self.env.stop()
 
         return rollout
@@ -68,10 +66,6 @@ class Agent(Serialization):
 
 
     def draw_action(self, state):
-        pass
-
-
-    def stop(self):
         pass
 
 
