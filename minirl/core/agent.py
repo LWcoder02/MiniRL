@@ -91,3 +91,7 @@ class Agent(Serialization):
 
         last = self._episode_steps >= self.env.info.horizon or absorbing
         return (state, action, reward, next_state, absorbing, last)
+    
+
+    def update_policy():
+        pass
