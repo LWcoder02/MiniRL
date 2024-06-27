@@ -9,7 +9,7 @@ class GridWorld(Environment):
         self.size = size
         self.render_mode = render_mode
 
-        self._target_position = (size-1, size-1) if not target_position else target_position
+        self._target_position = np.array([size-1, size-1]) if not target_position else target_position
 
         self.observation_space = spaces.Dict(
             {
@@ -31,8 +31,8 @@ class GridWorld(Environment):
 
 
     def reset(self, seed=None, state=None):
-        gym.Env.reset(seed=seed if not seed else 42)
-        self._agent_location = (0,0) if not state else state
+        # gym.Env.reset(seed=seed if not seed else 42)
+        self._agent_location = np.array([0,0]) if not state else state
 
         obs = self._get_obs()
         info = self._get_info()
@@ -45,10 +45,13 @@ class GridWorld(Environment):
 
     def step(self, action):
         direction = self._actions[action]
+        self._state[self._agent_location] = 0
 
         self._agent_location = np.clip(
             self._agent_location + direction, self.size - 1
         )
+
+        self._state[self._agent_location] = 1
 
         terminated = np.array_equal(self._agent_location, self._target_position)
         reward = 1 if terminated else 0.1
