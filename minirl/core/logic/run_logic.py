@@ -9,11 +9,9 @@ class TrainLogic():
         self._episodes_counter = 0
 
 
-    def init_learn(self, num_steps_per_fit, num_episodes_per_fit, num_steps, num_episodes):
+    def init_learn(self, num_steps_per_fit, num_episodes_per_fit):
         self.num_steps_per_fit = num_steps_per_fit
         self.num_episodes_per_fit = num_episodes_per_fit
-        self.num_steps = num_steps
-        self.num_episodes = num_episodes
 
         if self.num_steps_per_fit is not None:
             self.fit_condition = self._fit_steps
@@ -25,10 +23,7 @@ class TrainLogic():
         pass
 
 
-    def init_evaluate(self, num_steps, num_episodes):
-        self.num_steps = num_steps
-        self.num_episodes = num_episodes
-
+    def init_evaluate(self):
         self.fit_condition = lambda: False
 
 
