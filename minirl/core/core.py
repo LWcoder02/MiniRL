@@ -1,6 +1,7 @@
 from minirl.core.logic.run_logic import TrainLogic
 from minirl.core.agent import Agent
 from tqdm import tqdm
+from minirl.core.dataset import Dataset
 
 
 class Core():
@@ -18,13 +19,17 @@ class Core():
               num_steps_per_fit=None, num_episodes_per_fit=None, quiet=False):
         self._logic.init_learn(num_steps_per_fit=num_steps_per_fit, num_episodes_per_fit=num_episodes_per_fit)
 
-        self._run_impl()
+        dataset = Dataset()
+
+        self._run_impl(dataset)
 
 
     def evaluate(self, num_steps=None, num_episodes=None, quiet=False):
         self._logic.init_evaluate()
 
-        return self._run_impl()
+        dataset = Dataset()
+
+        return self._run_impl(dataset)
 
 
     def _run_impl(self, dataset):

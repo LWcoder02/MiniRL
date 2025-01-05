@@ -1,4 +1,4 @@
-
+from tqdm import tqdm
 
 class TrainLogic():
     def __init__(self):
@@ -7,6 +7,9 @@ class TrainLogic():
 
         self._steps_counter = 0
         self._episodes_counter = 0
+
+        self._steps_bar: tqdm = None
+        self._episode_bar: tqdm = None
 
 
     def init_learn(self, num_steps_per_fit, num_episodes_per_fit):
@@ -25,6 +28,14 @@ class TrainLogic():
 
     def init_evaluate(self):
         self.fit_condition = lambda: False
+
+
+    def after_step(self, done):
+
+        self._steps_bar.update(1)
+
+        if done:
+            self._episode_bar.update(1)
 
 
     def _fit_steps(self):
