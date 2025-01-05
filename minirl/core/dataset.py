@@ -1,12 +1,12 @@
 from minirl.core.serialization import Serialization
-from minirl.core.backend import DatasetBackend
+from minirl.core.datasets.numpy_dataset import NumpyDataset
 
 
 class DatasetInfo(Serialization):
-    def __init__(self, environment_info, agent_info, backend, device):
+    def __init__(self, environment_info, agent_info):
 
-        self.backend = backend
-        self.device = device
+        self.backend = agent_info.backend
+        self.device = agent_info.device
         self.gamma = environment_info.gamma
 
 
@@ -14,17 +14,17 @@ class DatasetInfo(Serialization):
 
 
 class Dataset(Serialization):
-    def __init__(self, dataset_info):
+    def __init__(self, environment_info, agent_info):
         
+        self._dataset_info = DatasetInfo(environment_info, agent_info, agent_info.backend, agent_info.device)
 
-        if dataset_info.backend == 'numpy':
-            self._dataset = ...
-        elif dataset_info.backend == 'torch':
+
+        if self._dataset_info.backend == 'numpy':
+            self._dataset = NumpyDataset()
+        elif self._dataset_info.backend == 'torch':
             self._dataset = ...
         else:
             self._dataset = ...
-
-        self._dataset_info = dataset_info
 
         super().__init__()
 
