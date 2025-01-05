@@ -1,17 +1,17 @@
 import torch
 import numpy as np
 
-from minirl.core.serialization import Serialization
+from minirl.approximators.approximator import Approximator
 from minirl.utils.minibatch_handling import generate_minibatch
 
 
-class TorchApproximator(Serialization):
+class TorchApproximator(Approximator):
     def __init__(self):
         self._optimizer = None
         self._loss_function = None
 
 
-    def predict(self):
+    def predict(self) -> torch.Tensor:
         pass
 
 

@@ -29,11 +29,11 @@ class AbstractDQN(Agent):
             # clip reward here
 
             q_next = self._q_next(next_state, terminal)
-            q = reward + self.mdp_info.gamma * q_next
+            q = reward + self.env_info.gamma * q_next
 
 
-            pred = torch.gather(input=state, index=action)
-            self.approximator.fit(pred, q)
+            pred = self.approximator.predict(state).gather(dim=1, index=action)
+            self.approximator.train(pred, q)
 
 
     def _q_next(self, next_state, terminal):
