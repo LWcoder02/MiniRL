@@ -2,10 +2,12 @@ from minirl.core.serialization import Serialization
 from minirl.core.logic.run_logic import TrainLogic
 from tqdm import tqdm
 from minirl.core.dataset import Dataset
+from minirl.core.environment import Environment, EnvironmentInfo
+from minirl.policy.policy import Policy
 
 
 class Agent(Serialization):
-    def __init__(self, environment, policy, environment_info):
+    def __init__(self, environment: Environment, policy: Policy, environment_info: EnvironmentInfo):
         self.policy = policy
         self.environment = environment
         self.env_info = environment_info
@@ -21,7 +23,7 @@ class Agent(Serialization):
 
 
 
-    def _run_impl(self, dataset):
+    def _run_impl(self, dataset: Dataset):
         self._logic.init_run()
 
         done = True
