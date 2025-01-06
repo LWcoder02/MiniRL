@@ -33,7 +33,7 @@ class AbstractDQN(Agent):
 
 
             pred = self.approximator.predict(state).gather(dim=1, index=action)
-            self.approximator.train(pred, q)
+            self.approximator.fit(pred, q)
 
 
     def _q_next(self, next_state, terminal):

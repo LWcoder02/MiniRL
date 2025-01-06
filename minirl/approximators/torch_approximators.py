@@ -15,7 +15,7 @@ class TorchApproximator(Approximator):
         pass
 
 
-    def train(self, *args, epochs, batch_size, num_targets=1):
+    def fit(self, *args, epochs, batch_size, num_targets=1):
         self._batch_size = batch_size
         for epoch in range(epochs):
             batches = generate_minibatch(self._batch_size, *args,

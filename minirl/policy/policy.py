@@ -2,7 +2,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 
-class AbstractPolicy(ABC):
+class Policy(ABC):
     
 
     @abstractmethod
