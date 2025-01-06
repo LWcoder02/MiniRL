@@ -11,14 +11,14 @@ class TD(Agent):
                  approximator: Approximator,
                  learning_rate: float):
 
-        self._alpha = learning_rate
+        self._alpha: float = learning_rate
         policy.set_q(approximator)
-        self.approximator = approximator
+        self.approximator: Approximator = approximator
 
         super().__init__(env_info, policy)
 
 
-    def train(self, dataset: Dataset):
+    def _train(self, dataset: Dataset):
         assert len(dataset) == 1
 
         state, action, reward, next_state, done, _ = dataset[0]
