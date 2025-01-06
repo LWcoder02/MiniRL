@@ -35,3 +35,11 @@ class Dataset(Serialization):
         dataset_info = DatasetInfo(environment_info, agent_info, backend=backend, device=device)
 
         return cls(dataset_info)
+    
+
+    def append(self, sample):
+        self._dataset.append(sample)
+
+
+    def clear(self):
+        self._dataset.clear()
