@@ -1,6 +1,11 @@
 import numpy as np
 
 
+class EnvironmentInfo():
+    def __init__(self, gamma):
+        self.gamma = gamma
+
+
 class Environment():
     def __init__(self):
         pass
