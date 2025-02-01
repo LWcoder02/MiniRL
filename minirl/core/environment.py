@@ -1,6 +1,11 @@
 import numpy as np
 
 
+class EnvironmentInfo():
+    def __init__(self, gamma):
+        self.gamma = gamma
+
+
 class Environment():
     def __init__(self):
         pass
@@ -14,11 +19,11 @@ class Environment():
         pass
 
 
-    def reset(self, seed=None, state=None):
+    def reset(self, seed: int = 0, initial_state=None):
         pass
 
 
-    def step(self, action):
+    def step(self, action: int):
         pass
 
 

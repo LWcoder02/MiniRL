@@ -7,15 +7,15 @@ from minirl.utils.minibatch_handling import generate_minibatch
 
 class TorchApproximator(Approximator):
     def __init__(self):
-        self._optimizer = None
-        self._loss_function = None
+        self._optimizer: torch.optim.Optimizer = None
+        self._loss_function: torch.nn.Module = None
 
 
     def predict(self) -> torch.Tensor:
         pass
 
 
-    def train(self, *args, epochs, batch_size, num_targets=1):
+    def fit(self, *args, epochs, batch_size, num_targets=1):
         self._batch_size = batch_size
         for epoch in range(epochs):
             batches = generate_minibatch(self._batch_size, *args,
@@ -26,7 +26,7 @@ class TorchApproximator(Approximator):
     def _perform_training_epoch(self, batches):
         loss_epoch = list()
         for sample, target in batches:
-            loss = self._compute_batch_loss(sample, target)
+            loss: torch.Tensor = self._compute_batch_loss(sample, target)
             loss_epoch.append(loss.item())
 
             self._optimizer.zero_grad()

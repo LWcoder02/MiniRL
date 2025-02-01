@@ -5,12 +5,13 @@ import torch
 
 from minirl.core.agent import Agent
 from minirl.approximators.torch_approximators import TorchApproximator
+from minirl.rl_utils.replay_memory import ReplayBuffer
 
 
 class AbstractDQN(Agent):
     def __init__(self):
         
-        self._replay_buffer = []
+        self._replay_buffer = ReplayBuffer()
         self._fit = self._train_standard
 
         self.approximator = TorchApproximator
@@ -33,7 +34,7 @@ class AbstractDQN(Agent):
 
 
             pred = self.approximator.predict(state).gather(dim=1, index=action)
-            self.approximator.train(pred, q)
+            self.approximator.fit(pred, q)
 
 
     def _q_next(self, next_state, terminal):

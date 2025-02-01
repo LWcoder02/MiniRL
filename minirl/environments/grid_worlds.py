@@ -30,9 +30,9 @@ class GridWorld(Environment):
         }
 
 
-    def reset(self, seed=None, state=None):
+    def reset(self, seed: int = 0, initial_state=None):
         # gym.Env.reset(seed=seed if not seed else 42)
-        self._agent_location = np.array([0,0]) if not state else state
+        self._agent_location = np.array([0,0]) if not initial_state else initial_state
 
         obs = self._get_obs()
         info = self._get_info()
