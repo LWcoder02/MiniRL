@@ -5,6 +5,7 @@ from minirl.core.dataset import Dataset
 from minirl.core.environment import Environment, EnvironmentInfo
 from minirl.policy.policy import Policy
 
+# Comment test
 
 class AgentInfo(Serialization):
     def __init__(self, backend = 'numpy'):

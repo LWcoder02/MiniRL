@@ -1,6 +1,5 @@
 from minirl.core.logic.run_logic import TrainLogic
 from minirl.core.agent import Agent
-from tqdm import tqdm
 from minirl.core.dataset import Dataset
 
 
@@ -12,6 +11,7 @@ class Core():
         self._logic = TrainLogic()
 
         self._state = None
+
 
 
 
