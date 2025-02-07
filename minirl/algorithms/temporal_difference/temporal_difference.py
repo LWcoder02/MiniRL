@@ -1,27 +1,28 @@
 from minirl.core.agent import Agent
 from minirl.core.dataset import Dataset
-from minirl.approximators.approximator import Approximator
+from minirl.approximators.table import Table
 
 
 class TD(Agent):
 
     def __init__(self,
-                 env_info,
+                 environment,
                  policy,
-                 approximator: Approximator,
+                 approximator: Table,
                  learning_rate: float):
 
-        self._alpha: float = learning_rate
-        policy.set_q(approximator)
-        self.approximator: Approximator = approximator
 
-        super().__init__(env_info, policy)
+        self._alpha: float = learning_rate
+        policy.set_approximator(approximator)
+        self.approximator: Table = approximator
+
+        super().__init__(environment, policy)
 
 
     def _train(self, dataset: Dataset):
         assert len(dataset) == 1
 
-        state, action, reward, next_state, done, _ = dataset[0]
+        state, action, reward, next_state, done = dataset[0]
         self._update(state, action, reward, next_state, done)
 
 
