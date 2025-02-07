@@ -6,11 +6,18 @@ from minirl.core.environment import Environment, EnvironmentInfo
 from minirl.policy.policy import Policy
 
 
+class AgentInfo(Serialization):
+    def __init__(self, backend = 'numpy'):
+        self.backend = backend
+        self.device = 'cpu'
+
+
 class Agent(Serialization):
-    def __init__(self, environment: Environment, policy: Policy, environment_info: EnvironmentInfo):
-        self.policy = policy
-        self.environment = environment
-        self.env_info = environment_info
+    def __init__(self, environment: Environment, policy: Policy):
+        self.policy: Policy = policy
+        self.environment: Environment = environment
+        self.env_info: EnvironmentInfo = self.environment.get_environment_info()
+        self._agent_info = AgentInfo()
 
         self._logic = TrainLogic()
 
@@ -23,28 +30,24 @@ class Agent(Serialization):
 
 
 
-    def _run_impl(self, dataset: Dataset):
-        self._logic.init_run()
+    def _run_impl(self, dataset: Dataset, num_steps, num_episodes, initial_state=None):
+        self._logic.init_run(num_steps, num_episodes)
 
         done = True
+
         while self._logic.move_condition():
             if done:
-                self._reset()
+                self._reset(initial_state=initial_state)
 
 
-            sample = self._step()
-
-            dataset.append(sample)
-
+            state, action, reward, next_state, done, _ = self._step()
+            self._logic.after_step(done)
+            dataset.append((state, action, reward, next_state, done))
 
             if self._logic.fit_condition():
                 self._train(dataset)
 
                 dataset.clear()
-
-            
-            done = sample[4]
-
 
         return dataset
     
@@ -56,20 +59,24 @@ class Agent(Serialization):
         state = self._state
         self._state = next_state
 
-        return (state, action, reward, next_state, done), info
+        return state, action, reward, next_state, done, info
     
 
-    def _reset(self):
-        pass
+    def _reset(self, initial_state):
+        # initial_state = self._logic.get_initial_state(initial_state)
+
+        state, info = self.environment.reset(initial_state=initial_state)
+        self._state = state
 
 
     def learn(self, num_steps=None, num_episodes=None,
               num_steps_per_fit=None, num_episodes_per_fit=None, quiet=False):
+        
         self._logic.init_learn(num_steps_per_fit=num_steps_per_fit, num_episodes_per_fit=num_episodes_per_fit)
 
-        dataset = Dataset()
-
-        self._run_impl(dataset)
+        dataset = Dataset(environment_info=self.env_info, agent_info=self._agent_info,
+                          num_steps=num_steps)
+        self._run_impl(dataset, num_steps=num_steps, num_episodes=num_episodes)
 
 
     def evaluate(self, num_steps=None, num_episodes=None, quiet=False):
@@ -77,7 +84,7 @@ class Agent(Serialization):
 
         dataset = Dataset()
 
-        return self._run_impl(dataset)
+        return self._run_impl(dataset, num_steps=num_steps, num_episodes=num_episodes)
 
 
     def draw_action(self, state):

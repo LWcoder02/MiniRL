@@ -15,6 +15,4 @@ def generate_minibatch(batch_size, *dataset, num_targets=1):
         for i in range(len(dataset)):
             data.append(dataset[i][indixes[start:end]])
 
-        x = data[:-num_targets]
-        y = data[-num_targets:]
-        yield x, y
+        yield data

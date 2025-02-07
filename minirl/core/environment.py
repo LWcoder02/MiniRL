@@ -1,14 +1,24 @@
 import numpy as np
 
+from minirl.core.serialization import Serialization
 
-class EnvironmentInfo():
-    def __init__(self, gamma):
+
+class EnvironmentInfo(Serialization):
+    def __init__(self, action_space, observation_space, gamma = 0.9, horizon = None):
         self.gamma = gamma
+        self.action_space = action_space
+        self.observation_space = observation_space
+        self.num_actions = self.action_space.n
+        self.horizon = horizon
 
 
-class Environment():
-    def __init__(self):
-        pass
+class Environment(object):
+    def __init__(self, environment_info: EnvironmentInfo):
+        self._environment_info = environment_info
+
+
+    def get_environment_info(self) -> EnvironmentInfo:
+        return self._environment_info
 
 
     def make(self, env_name):
