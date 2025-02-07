@@ -3,7 +3,6 @@ import torch
 from collections import deque
 
 
-<<<<<<< HEAD
 class Backend():
     
     @staticmethod
@@ -53,36 +52,3 @@ class NumpyBackend(Backend):
     @staticmethod
     def size(arr):
         return np.size(arr)
-=======
-class DatasetBackend(object):
-
-    @staticmethod
-    def to_numpy(dataset):
-        raise NotImplementedError()
-    
-
-    @staticmethod
-    def to_torch(dataset):
-        raise NotImplementedError()
-
-
-
-class NumpyDataset(DatasetBackend):
-    
-    
-    @staticmethod
-    def to_numpy(dataset):
-        return dataset
-    
-
-    def to_torch(dataset):
-        return torch.from_numpy(dataset)
-
-
-class ListDataset(DatasetBackend):
-    ...
-
-
-class TorchDataset(DatasetBackend):
-    ...
->>>>>>> 8c1f63ed8883cd2453d62562098f31a259a2d8b9
