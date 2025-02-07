@@ -1,6 +1,6 @@
 from minirl.environments.grid_worlds import GridWorld
 
-if __name__ =='__main__':
+def test_environemt():
     grid_world = GridWorld()
     obs, info = grid_world.reset()
     print(obs)
