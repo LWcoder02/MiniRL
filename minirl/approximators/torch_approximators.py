@@ -7,11 +7,16 @@ import torch.nn as nn
 
 
 class TorchApproximator(Approximator):
-    def __init__(self, model: nn.Module, input_shape: int, output_shape: int, num_fit_args: int = 1):
-        self._optimizer: torch.optim.Optimizer = None
-        self._loss_function: torch.nn.Module = None
-        self.model = model(input_shape, output_shape)
+    def __init__(self, model: nn.Module, input_shape: int, output_shape: int,
+                 optimizer: torch.optim.Optimizer | dict = None,
+                 loss_function: torch.nn.Module | str = None,
+                 num_fit_args: int = 1):
+        self.model: nn.Module = model(input_shape, output_shape)
         self._num_fit_args = num_fit_args
+
+        self._optimizer: torch.optim.Optimizer = getattr(torch.optim, optimizer['class']) if type(optimizer) is dict else optimizer['class']
+        self._loss_function: torch.nn.Module = getattr(torch.nn, loss_function) if type(loss_function) is str else loss_function
+        self._optimizer(self.model.parameters(), **optimizer['params'])
 
 
     def predict(self, *args) -> torch.Tensor:
@@ -51,3 +56,31 @@ class TorchApproximator(Approximator):
         loss = self._loss_function(yhat, *y)
 
         return loss
+    
+
+    def set_weights(self, weights: torch.Tensor):
+        idx = 0
+        for params in self.model.parameters():
+            shape = params.data.shape
+
+            c = 1
+            for s in shape:
+                c *= s
+
+            weight = weights[idx:idx + c].reshape(shape)
+
+            weight_tensor = torch.as_tensor(weight, device=self._device).type(params.data.dtype)
+
+            params.data = weight_tensor
+            idx += c
+
+
+    def get_weights(self):
+        weights = list()
+
+        for p in self.model.parameters():
+            weight = p.data.detach()
+            weights.append(weight.flatten())
+
+        weights = torch.concatenate(weights)
+        return weights
