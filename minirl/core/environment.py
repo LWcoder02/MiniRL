@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Tuple, Any, Dict
 
 from minirl.core.serialization import Serialization
 
@@ -33,7 +34,7 @@ class Environment(object):
         pass
 
 
-    def step(self, action: int):
+    def step(self, action: int) -> Tuple[Any, float, bool, Dict[Any, Any]]:
         pass
 
 

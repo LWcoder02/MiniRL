@@ -5,7 +5,8 @@ from minirl.algorithms.temporal_difference.q_learning import QLearning
 from minirl.environments.grid_worlds import GridWorld
 from minirl.policy.td_policy import EpsilonGreedyPolicy
 from minirl.core.dataset import Dataset
-from test.test_parameters import test_parameter
+from minirl.core.agent import Agent
+
 
 
 
@@ -45,8 +46,6 @@ def train_and_evaluate():
     print(i)
 
 
-def test_parameters():
-    test_parameter()
 
 
 

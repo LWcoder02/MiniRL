@@ -16,8 +16,12 @@ class NumpyDataset(Serialization):
 
 
     def __repr__(self):
-        return f"States: Shape{self._states.shape}\n{self._states} \
-            \nActions: Shape{self._actions.shape} \n{self._actions}"
+        return f"NumpyDataset \nStates: Shape{self._states.shape}\n{self._states} \
+            \nActions: Shape{self._actions.shape} \n{self._actions} \
+            \nRewards: \n{self._rewards} \
+            \nNext States: \n{self._next_states} \
+            \nDones: \n{self._dones} \
+            \nNumber of Samples in dataset: {self._len}"
 
     
     def __len__(self):
@@ -27,6 +31,19 @@ class NumpyDataset(Serialization):
     def __getitem__(self, idx):
         return self._states[idx], self._actions[idx], self._rewards[idx], self._next_states[idx], \
             self._dones[idx]
+    
+    @classmethod
+    def create_new_instance(cls, dataset=None):
+        new_dataset = cls.__new__(cls)
+
+        new_dataset._states = None
+        new_dataset._actions = None
+        new_dataset._rewards = None
+        new_dataset._next_states = None
+        new_dataset._dones = None
+        new_dataset._len = None
+
+        return new_dataset
     
 
     def append(self, state, action, reward, next_state, done):
@@ -49,3 +66,7 @@ class NumpyDataset(Serialization):
         self._next_states = np.empty_like(self._next_states)
         self._dones = np.empty_like(self._dones)
         self._len = 0
+
+
+    def _convert(self):
+        raise NotImplementedError("_convert is currently not implemented")

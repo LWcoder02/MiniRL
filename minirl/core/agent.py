@@ -4,23 +4,26 @@ from tqdm import tqdm
 from minirl.core.dataset import Dataset
 from minirl.core.environment import Environment, EnvironmentInfo
 from minirl.policy.policy import Policy
+from minirl.core.backend import Backend
 
 # Comment test
 
 class AgentInfo(Serialization):
-    def __init__(self, backend = 'numpy'):
+    def __init__(self, backend):
         self.backend = backend
         self.device = 'cpu'
 
 
 class Agent(Serialization):
-    def __init__(self, environment: Environment, policy: Policy):
+    def __init__(self, environment: Environment, policy: Policy, backend: str = 'numpy'):
         self.policy: Policy = policy
         self.environment: Environment = environment
         self.env_info: EnvironmentInfo = self.environment.get_environment_info()
-        self._agent_info = AgentInfo()
+        self._agent_info = AgentInfo(backend=backend)
 
         self._logic = TrainLogic()
+
+        self._backend: Backend = Backend.get_backend(backend)
 
         self._state = None
 
@@ -75,8 +78,8 @@ class Agent(Serialization):
         
         self._logic.init_learn(num_steps_per_fit=num_steps_per_fit, num_episodes_per_fit=num_episodes_per_fit)
 
-        dataset = Dataset(environment_info=self.env_info, agent_info=self._agent_info,
-                          num_steps=num_steps)
+        dataset = Dataset.generate(environment_info=self.env_info, agent_info=self._agent_info,
+                                   num_steps=num_steps_per_fit, num_episodes=num_episodes_per_fit)
         self._run_impl(dataset, num_steps=num_steps, num_episodes=num_episodes)
 
 

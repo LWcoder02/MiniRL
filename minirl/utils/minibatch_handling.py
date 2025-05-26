@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def generate_minibatch(batch_size, *dataset, num_targets=1):
+def generate_minibatch(batch_size, *dataset):
     size = len(dataset[0])
     num_batches = int(np.ceil(size/batch_size))
     batches_intervals = [(i * batch_size, min(size, (i+1)*batch_size))
