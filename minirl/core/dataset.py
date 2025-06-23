@@ -31,7 +31,7 @@ class Dataset(Serialization):
 
         base_shape = (num_samples,)
         state_shape = base_shape + self._dataset_info.state_shape
-        action_shape = base_shape + self._dataset_info.action_shape
+        action_shape = base_shape # + self._dataset_info.action_shape
         reward_shape = base_shape
 
 
@@ -78,4 +78,34 @@ class Dataset(Serialization):
 
 
     def parse(self):
-        self._dataset._convert()
+        to = self._backend.get_backend_name()
+        return self._convert(self.state, self.action, self.reward, self.next_state, self.done,
+                               to=to)
+
+
+    @property
+    def state(self):
+        return self._dataset.state
+    
+    @property
+    def action(self):
+        return self._dataset.action
+    
+    @property
+    def reward(self):
+        return self._dataset.reward
+    
+    @property
+    def next_state(self):
+        return self._dataset.next_state
+    
+    @property
+    def done(self):
+        return self._dataset.done
+    
+
+    def _convert(self, *arrays, to="numpy"):
+        if to == 'numpy':
+            return self._backend.arrays_to_numpy(*arrays)
+        else:
+            raise NotImplementedError()

@@ -66,7 +66,24 @@ class NumpyDataset(Serialization):
         self._next_states = np.empty_like(self._next_states)
         self._dones = np.empty_like(self._dones)
         self._len = 0
+    
 
-
-    def _convert(self):
-        raise NotImplementedError("_convert is currently not implemented")
+    @property
+    def state(self):
+        return self._states[:len(self)]
+    
+    @property
+    def action(self):
+        return self._actions[:len(self)]
+    
+    @property
+    def reward(self):
+        return self._rewards[:len(self)]
+    
+    @property
+    def next_state(self):
+        return self._next_states[:len(self)]
+    
+    @property
+    def done(self):
+        return self._dones[:len(self)]

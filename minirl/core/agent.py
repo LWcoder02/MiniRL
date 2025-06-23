@@ -9,9 +9,9 @@ from minirl.core.backend import Backend
 # Comment test
 
 class AgentInfo(Serialization):
-    def __init__(self, backend):
+    def __init__(self, backend, device: str = 'cpu'):
         self.backend = backend
-        self.device = 'cpu'
+        self.device = device
 
 
 class Agent(Serialization):
