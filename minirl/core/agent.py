@@ -6,8 +6,6 @@ from minirl.core.environment import Environment, EnvironmentInfo
 from minirl.policy.policy import Policy
 from minirl.core.backend import Backend
 
-# Comment test
-
 class AgentInfo(Serialization):
     def __init__(self, backend):
         self.backend = backend
@@ -29,7 +27,7 @@ class Agent(Serialization):
 
 
 
-    def _train(self, dataset):
+    def train(self, dataset):
         raise NotImplementedError("Train method is not implemented since Agent is an abstract class")
 
 
@@ -49,7 +47,7 @@ class Agent(Serialization):
             dataset.append((state, action, reward, next_state, done))
 
             if self._logic.fit_condition():
-                self._train(dataset)
+                self.train(dataset)
 
                 dataset.clear()
 
