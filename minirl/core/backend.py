@@ -12,6 +12,10 @@ class Backend():
             return NumpyBackend
         else:
             raise ValueError(f"Unknown backend type: {backend_type}")
+        
+    @staticmethod
+    def get_backend_name():
+        raise NotImplementedError()
     
     @staticmethod
     def to_numpy(array: list| np.ndarray | torch.Tensor):
@@ -22,13 +26,21 @@ class Backend():
     def to_torch(array: list| np.ndarray | torch.Tensor):
         raise NotImplementedError
     
-
     @classmethod
-    def zeros(cls, *dims, dtype, device=None):
-        raise NotImplementedError
+    def arrays_to_numpy(cls, *arrays):
+        return tuple(cls.to_numpy(array) for array in arrays)
     
     @classmethod
-    def ones(cls, *dims, dtype, device=None):
+    def arrays_to_torch(cls, *arrays):
+        return tuple(cls.to_torch(array) for array in arrays)
+    
+
+    @staticmethod
+    def zeros(*dims, dtype, device=None):
+        raise NotImplementedError
+    
+    @staticmethod
+    def ones(*dims, dtype, device=None):
         raise NotImplementedError
     
 
@@ -36,8 +48,16 @@ class Backend():
     def size(arr):
         raise NotImplementedError
     
+    @staticmethod
+    def randint(low, high, size):
+        raise NotImplementedError
+    
 
 class NumpyBackend(Backend):
+
+    @staticmethod
+    def get_backend_name():
+        return 'numpy'
 
     @staticmethod
     def to_numpy(array):
@@ -48,22 +68,37 @@ class NumpyBackend(Backend):
         return None if array is None else torch.from_numpy(array)
     
 
-    @classmethod
-    def zeros(cls, *dims, dtype=float, device=None):
-        return cls.zeros(dims, dtype=dtype)
+    @staticmethod
+    def zeros(*dims, dtype=float, device=None):
+        return np.zeros(dims, dtype=dtype)
     
-    @classmethod
-    def ones(cls, *dims, dtype=float, device=None):
-        return cls.ones(dims, dtype=dtype)
+    @staticmethod
+    def ones(*dims, dtype=float, device=None):
+        return np.ones(dims, dtype=dtype)
     
 
     @staticmethod
     def size(arr):
         return np.size(arr)
+    
+
+    @staticmethod
+    def shape(arr: np.ndarray):
+        return arr.shape
+    
+
+    @staticmethod
+    def randint(low, high, size):
+        return np.random.randint(low, high, size)
 
 
 
 class TorchBackend(Backend):
+
+    @staticmethod
+    def get_backend_name():
+        return 'torch'
+
     @staticmethod
     def to_numpy(array: torch.Tensor) -> np.ndarray:
         return None if array is None else array.detach().cpu().numpy()
@@ -74,16 +109,21 @@ class TorchBackend(Backend):
         return array
     
 
-    @classmethod
-    def zeros(cls, *dims, dtype=float, device=None)-> torch.Tensor:
-        return cls.zeros(dims, dtype=dtype, device=device)
+    @staticmethod
+    def zeros(*dims, dtype=float, device=None)-> torch.Tensor:
+        return torch.zeros(dims, dtype=dtype, device=device)
     
 
-    @classmethod
-    def ones(cls, *dims, dtype=float, device=None) -> torch.Tensor:
-        return cls.ones(dims, dtype=dtype)
+    @staticmethod
+    def ones(*dims, dtype=float, device=None) -> torch.Tensor:
+        return torch.ones(dims, dtype=dtype)
     
 
     @staticmethod
     def size(arr: torch.Tensor) -> torch.Size:
+        return arr.size()
+    
+
+    @staticmethod
+    def shape(arr: torch.Tensor) -> Tuple:
         return arr.size()
