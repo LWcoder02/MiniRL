@@ -16,7 +16,7 @@ def train_test_agent():
     environment = GridWorld()
     policy = EpsilonGreedyPolicy(1.0, decay=0.95, eps_min=0.005)
     agent = QLearning(environment=environment, policy=policy, learning_rate=0.1)
-    agent.learn(num_steps=10_000, num_steps_per_fit=1)
+    # agent.learn(num_steps=10_000, num_steps_per_fit=1)
     return agent
 
 
