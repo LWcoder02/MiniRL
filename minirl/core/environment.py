@@ -5,12 +5,14 @@ from minirl.core.serialization import Serialization
 
 
 class EnvironmentInfo(Serialization):
-    def __init__(self, action_space, observation_space, gamma = 0.9, horizon = None):
+    def __init__(self, action_space, observation_space, gamma: float = 0.9, horizon: int = None,
+                 backend: str = 'numpy'):
         self.gamma = gamma
         self.action_space = action_space
         self.observation_space = observation_space
         self.num_actions = self.action_space.n
         self.horizon = horizon
+        self.backend = backend
 
 
 class Environment(object):

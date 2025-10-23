@@ -1,14 +1,15 @@
 from minirl.policy.policy import Policy
 import numpy as np
 from minirl.rl_utils.parameters import Parameter
+from minirl.approximators.approximator import Approximator
 
 
 class TDPolicy(Policy):
     def __init__(self):
-        self._approximator = None
+        self._approximator: Approximator = None
 
 
-    def set_approximator(self, approximator):
+    def set_approximator(self, approximator: Approximator):
         self._approximator = approximator
 
 
@@ -31,7 +32,4 @@ class EpsilonGreedyPolicy(TDPolicy):
         
         return np.array([np.random.choice(self._approximator.num_actions)])[0]
     
-
-    def _update(self):
-        self.epsilon = max(self._eps_min, self.epsilon * self._decay)
 

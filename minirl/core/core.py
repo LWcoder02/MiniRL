@@ -4,7 +4,7 @@ from minirl.core.dataset import Dataset
 from minirl.core.environment import Environment
 
 
-class Core():
+class Core(object):
     def __init__(self, agent: Agent, environment: Environment):
         self.agent: Agent = agent
         self.environment: Environment = environment
@@ -14,13 +14,12 @@ class Core():
         self._state = None
 
 
-
-
     def learn(self, num_steps: int = None, num_episodes: int = None,
               num_steps_per_fit: int = None, num_episodes_per_fit: int= None, quiet: bool = False):
         self._logic.init_learn(num_steps_per_fit=num_steps_per_fit, num_episodes_per_fit=num_episodes_per_fit)
 
-        dataset = Dataset()
+        dataset = Dataset.generate(environment_info=self.environment.get_environment_info(),
+                                   num_steps=num_steps, num_episodes=num_episodes)
 
         self._run_impl(dataset, num_steps=num_steps, num_episodes=num_episodes)
 
@@ -28,7 +27,8 @@ class Core():
     def evaluate(self, num_steps: int = None, num_episodes: int = None, quiet: bool = False):
         self._logic.init_evaluate()
 
-        dataset = Dataset()
+        dataset = Dataset.generate(environment_info=self.environment.get_environment_info(),
+                                   num_steps=num_steps, num_episodes=num_episodes)
 
         return self._run_impl(dataset, num_steps=num_steps, num_episodes=num_episodes)
 

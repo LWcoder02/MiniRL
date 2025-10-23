@@ -19,7 +19,7 @@ class TD(Agent):
         super().__init__(environment, policy)
 
 
-    def _train(self, dataset: Dataset):
+    def train(self, dataset: Dataset):
         assert len(dataset) == 1
 
         state, action, reward, next_state, done = dataset[0]

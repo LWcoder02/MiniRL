@@ -33,8 +33,10 @@ class GridWorld(Environment):
             3: np.array([0,1]) # Down
         }
 
-        env_info = EnvironmentInfo(observation_space=self.observation_space,
-                                   action_space=self.action_space)
+        # self.backend = 'numpy'
+
+        env_info = EnvironmentInfo(action_space=self.action_space, observation_space=self.observation_space,
+                                   gamma=0.9, horizon=100, backend='numpy')
         super().__init__(env_info)
     
 

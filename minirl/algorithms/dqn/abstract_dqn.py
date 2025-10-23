@@ -49,7 +49,7 @@ class AbstractDQN(Agent):
                 reward = np.clip(reward, -1, 1)
 
             q_next = self._q_next(next_state, terminal)
-            q = reward + self.env_info.gamma * q_next
+            q = reward + self._env_info.gamma * q_next
 
 
             pred = self.approximator.predict(state).gather(dim=1, index=action)

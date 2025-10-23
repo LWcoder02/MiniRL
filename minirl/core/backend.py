@@ -26,6 +26,12 @@ class Backend():
     def to_torch(array: list| np.ndarray | torch.Tensor):
         raise NotImplementedError
     
+    
+    @classmethod
+    def convert_to_backend(cls, array):
+        raise NotImplementedError
+
+
     @classmethod
     def arrays_to_numpy(cls, *arrays):
         return tuple(cls.to_numpy(array) for array in arrays)
@@ -69,6 +75,11 @@ class NumpyBackend(Backend):
     
 
     @staticmethod
+    def convert_to_backend(cls, array):
+        return cls.to_numpy(array)
+
+
+    @staticmethod
     def zeros(*dims, dtype=float, device=None):
         return np.zeros(dims, dtype=dtype)
     
@@ -108,6 +119,11 @@ class TorchBackend(Backend):
     def to_torch(array: List[Any] | np.ndarray) -> torch.Tensor:
         return array
     
+
+    @staticmethod
+    def convert_to_backend(cls, array):
+        return cls.to_torch(array)
+
 
     @staticmethod
     def zeros(*dims, dtype=float, device=None)-> torch.Tensor:

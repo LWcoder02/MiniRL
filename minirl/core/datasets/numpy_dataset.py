@@ -1,3 +1,4 @@
+from __future__ import annotations
 from minirl.core.serialization import Serialization
 import numpy as np
 
@@ -33,7 +34,7 @@ class NumpyDataset(Serialization):
             self._dones[idx]
     
     @classmethod
-    def create_new_instance(cls, dataset=None):
+    def create_new_empty_dataset(cls, dataset=None):
         new_dataset = cls.__new__(cls)
 
         new_dataset._states = None
@@ -67,6 +68,37 @@ class NumpyDataset(Serialization):
         self._dones = np.empty_like(self._dones)
         self._len = 0
     
+
+    def get_view(self, index, copy: bool = False) -> NumpyDataset:
+        new_dataset = self.create_new_empty_dataset(self)
+
+        if copy:
+            new_dataset._states = np.empty_like(self._states)
+            new_dataset._actions = np.empty_like(self._actions)
+            new_dataset._rewards = np.empty_like(self._rewards)
+            new_dataset._next_states = np.empty_like(self._next_states)
+            new_dataset._dones = np.empty_like(self._dones)
+
+            new_states = self._states[index, ...]
+            new_len = new_states.shape[0]
+
+            new_dataset._states[:new_len] = new_states[index, ...]
+            new_dataset._actions[:new_len] = self._actions[index, ...]
+            new_dataset._rewards[:new_len] = self._rewards[index, ...]
+            new_dataset._next_states[:new_len] = self._next_states[index, ...]
+            new_dataset._dones[:new_len] = self._dones[index, ...]
+            new_dataset._len = new_len
+
+        else:
+            new_dataset._states = self._states[index, ...]
+            new_dataset._actions = self._actions[index, ...]
+            new_dataset._rewards = self._rewards[index, ...]
+            new_dataset._next_states = self._next_states[index, ...]
+            new_dataset._dones = self._dones[index, ...]
+            new_dataset._len = new_dataset._states.shape[0]
+
+        return new_dataset
+
 
     @property
     def state(self):

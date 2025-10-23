@@ -1,8 +1,11 @@
-from minirl.core.dataset import Dataset
+from minirl.core.dataset import Dataset, DatasetInfo
+from minirl.core.agent import AgentInfo
+from minirl.core.environment import EnvironmentInfo
 
 
 class ReplayBuffer():
-    def __init__(self, environment_info, agent_info, max_size: int = 5000, initial_size: int = 50):
+    def __init__(self, environment_info: EnvironmentInfo, agent_info: AgentInfo,
+                 max_size: int = 5000, initial_size: int = 50):
         self._initial_size = initial_size
         self._max_size: int = max_size
         self._idx: int = 0
@@ -21,7 +24,7 @@ class ReplayBuffer():
 
     def add(self, dataset: Dataset):
 
-        state, action, reward, next_state, dones = dataset.parse()
+        state, action, reward, next_state, dones = dataset.parse(to=self._agent_info.backend)
         i = 0
         while i < len(dataset):
             if self._full:
@@ -51,9 +54,9 @@ class ReplayBuffer():
     def reset(self):
         self._idx = 0
         self._full = False
-        self._dataset: Dataset = Dataset(environment_info=self._environment_info,
-                                agent_info=self._agent_info,
-                                num_steps=self._max_size)
+        replay_memory_info: DatasetInfo = DatasetInfo.create_dataset_info(self._environment_info)
+        self._dataset: Dataset = Dataset(replay_memory_info, num_steps=self._max_size)
+
         
     @property
     def init(self):
