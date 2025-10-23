@@ -6,6 +6,7 @@ from minirl.environments.grid_worlds import GridWorld
 from minirl.policy.td_policy import EpsilonGreedyPolicy
 from minirl.core.dataset import Dataset
 from minirl.core.agent import Agent
+from minirl.utils.minibatch_handling import generate_minibatch
 
 
 
@@ -23,8 +24,14 @@ def inspect():
     environment = GridWorld()
     policy = EpsilonGreedyPolicy(1.0)
     agent = QLearning(environment=environment, policy=policy, learning_rate=0.001)
-    dataset = Dataset(environment.get_environment_info(), agent_info=agent._agent_info, num_steps=10)    
-    print(dataset)
+    dataset = Dataset(environment.get_environment_info(), agent_info=agent._agent_info, num_steps=10)
+    agent._reset(initial_state=None)
+    for i in range(10):
+        sample = agent._step()
+        dataset.append(sample=sample[:-1]) 
+    # print(dataset)
+    for batch in generate_minibatch(4, dataset):
+        print(batch)
 
 
 def train_and_evaluate():
@@ -50,7 +57,7 @@ def train_and_evaluate():
 
 
 def main():
-    train_and_evaluate()
+    inspect()
 
 
 if __name__ == '__main__':
