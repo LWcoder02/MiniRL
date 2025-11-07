@@ -1,21 +1,27 @@
 from minirl.core.serialization import Serialization
-from tqdm import tqdm
 from minirl.core.environment import EnvironmentInfo
 from minirl.policy.policy import Policy
 from minirl.core.backend import Backend
 
+
 class AgentInfo(Serialization):
-    def __init__(self, backend, device: str = "cpu"):
+    def __init__(self, backend: Backend, agent_id: int | str, device: str = "cpu"):
         self.backend = backend
         self.device = device
+        self.agent_id = agent_id
 
 
 
 class Agent(Serialization):
-    def __init__(self, environment_info: EnvironmentInfo, policy: Policy, backend: str = 'numpy'):
+    def __init__(self,
+                 environment_info: EnvironmentInfo,
+                 policy: Policy,
+                 agent_id: int | str = "agent_0",
+                 backend: str = 'numpy'):
         self._policy: Policy = policy
         self._env_info: EnvironmentInfo = environment_info
-        self._agent_info = AgentInfo(backend=backend)
+        self._agent_id = agent_id
+        self._agent_info = AgentInfo(backend=backend, agent_id=agent_id)
 
         self._agent_backend: Backend = Backend.get_backend(backend)
         self._env_backend: Backend = Backend.get_backend(self._env_info.backend)

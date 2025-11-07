@@ -1,7 +1,79 @@
+from __future__ import annotations
 import numpy as np
 from gymnasium import spaces
+from minirl.rl_utils.states import AbstractState
+
+from typing import Tuple, Dict, Any
 
 from minirl.core.environment import Environment, EnvironmentInfo
+from minirl.core.environment import ActionType, ObsDict, RewardDict, TerminatedDict, InfoDict
+
+
+class GridState(AbstractState):
+    def __init__(self,
+                 agent_position: np.ndarray[int, int],
+                 target_position: np.ndarray[int, int],
+                 size: np.ndarray[int, int],
+                 wall_positions: np.ndarray = None):
+        self._agent_position = agent_position
+        self._target_position = target_position
+        self._size = size
+        self._walls = wall_positions
+        self._reward: int = -1
+        self._terminal: bool = False
+
+    def __getitem__(self, idx):
+        return self._agent_position[idx]
+    
+
+    def apply_action(self, action: np.ndarray) -> None:
+        reward: int = -1
+        agent_next_position = self._agent_position.copy() + action
+        if (0 <= agent_next_position[0] < self._size[0]) and (0 <= agent_next_position[1] < self._size[1]):
+            if self._check_walls(position=agent_next_position):
+                self._agent_position = agent_next_position
+            else:
+                reward = -10
+        else:
+            reward = -10
+
+        self._terminal = np.all(self._agent_position == self._target_position)
+        self._reward = 1 if self._terminal else reward
+
+    
+    def get_observation(self) -> np.ndarray:
+        return self._agent_position
+    
+
+    def get_reward(self) -> int:
+        return self._reward
+    
+
+    def get_terminal(self) -> bool:
+        return self._terminal
+
+
+    def render(self) -> None:
+        pass
+    
+
+    def _check_walls(self, position):
+        if self._walls is None:
+            return True
+        return False
+
+
+    def get_info(self) -> Dict[str, Any]:
+        return {
+            'distance': np.linalg.norm(self._agent_position - self._target_position, ord=1),
+            'agent_position': self._agent_position,
+            'target': self._target_position
+        }
+
+
+    def get_actions(self):
+        return []
+
 
 class GridWorld(Environment):
     def __init__(self, size=(5,5),
@@ -11,20 +83,14 @@ class GridWorld(Environment):
         self.size = size
         self.render_mode = render_mode
 
-        self.start_position: np.ndarray[int, int] = np.array([0, 0])
-        self._target_position: np.ndarray[int, int] = np.array([self.size[1]-1, self.size[0]-1])
+        self._state = GridState(agent_position=start_position, target_position=target_position)
 
-        self.observation_space = spaces.Box(low= np.array([0,0]),
+        self._observation_space = spaces.Box(low= np.array([0,0]),
                                             high=np.array(self.size)-1,
                                             shape=(2,), dtype=int)
 
-        self._maze = np.zeros(size)
-        self._maze[self._target_position[1], self._target_position[0]] = 2
-        self._maze[self.start_position[1], self.start_position[0]] = 1
-
-        self.action_space = spaces.Discrete(4)
-
-        self.state: np.ndarray[int, int] = self.start_position
+        # self._agent_id = "agent"
+        self._action_space = spaces.Discrete(4)
 
         self._actions = {
             0: np.array([1,0]), # Right
@@ -32,58 +98,33 @@ class GridWorld(Environment):
             2: np.array([0,-1]), # Up
             3: np.array([0,1]) # Down
         }
+        
 
-        # self.backend = 'numpy'
-
-        env_info = EnvironmentInfo(action_space=self.action_space, observation_space=self.observation_space,
+        env_info = EnvironmentInfo(action_space=self._action_space, observation_space=self._observation_space,
                                    gamma=0.9, horizon=100, backend='numpy')
         super().__init__(env_info)
     
 
-
     def render(self):
-        grid = np.copy(self._maze)
-        x, y = self.state[0], self.state[1]
-        goal_x, goal_y = self._target_position[0], self._target_position[1]
-        grid[goal_x, goal_y] = 2
-        grid[y,x] = 1
-        print(grid)
+        pass
 
 
-    def reset(self, seed = 0, initial_state=None):
-        self._maze = np.zeros(self.size)
-        self.state = self.start_position
-        return self.state, {}
+    def reset(self,
+              seed: int = 0,
+              initial_state=None,
+              options: Dict[str, Any] | None = None):
+        return self._state.reset()
 
 
-    def step(self, action:int):
-        reward = -1
-        done = False
+    def step(self, action: ActionType) -> Tuple[np.ndarray, int, bool, InfoDict]:
+        direction = self._actions[action]
+        self._state.apply_action(action=direction)
 
-        next_state = self.state.copy() + self._actions[action]
-        if (0 <= next_state[0] < self.size[0]) and (0 <= next_state[1] < self.size[1]):
-            if self._maze[next_state[1], next_state[0]] != -1:
-                self.state = next_state
-            else:
-                reward = -10
-        else:
-            reward = -10
+        obs = self._state.get_observation()
+        reward = self._state.get_reward()
+        done = self._state.get_terminal()
+        info = self._state.get_info()
 
-        done = np.all(self.state == self._target_position)
-        reward = 1 if done else reward
+        return obs, reward, done, info
 
-        return next_state, reward, done, self._get_info()
-
-
-    def _get_obs(self):
-        return self.state
     
-
-    def _get_info(self):
-        return {
-            'distance': np.linalg.norm(
-                self.state - self._target_position, ord=1
-            ),
-            'agent': self.state,
-            'target': self._target_position
-        }

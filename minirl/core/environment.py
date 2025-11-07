@@ -1,7 +1,20 @@
 import numpy as np
-from typing import Tuple, Any, Dict
+import gymnasium as gym
+from typing import Tuple, Any, Dict, TypeVar
 
 from minirl.core.serialization import Serialization
+from abc import abstractmethod, ABC
+
+
+
+AgentID = TypeVar("AgentID")
+ActionType = TypeVar("ActionType")
+ObsType = TypeVar("ObsType")
+ObsDict = Dict[AgentID, ObsType]
+ActionDict = Dict[AgentID, ActionType]
+RewardDict = Dict[AgentID, float]
+TerminatedDict = Dict[AgentID, bool]
+InfoDict = Dict[AgentID, Dict[str, Any]]
 
 
 class EnvironmentInfo(Serialization):
@@ -15,12 +28,13 @@ class EnvironmentInfo(Serialization):
         self.backend = backend
 
 
-class Environment(object):
+class Environment(ABC):
     def __init__(self, environment_info: EnvironmentInfo):
         self._environment_info = environment_info
 
 
-    def get_environment_info(self) -> EnvironmentInfo:
+    @property
+    def environment_info(self) -> EnvironmentInfo:
         return self._environment_info
 
 
@@ -32,21 +46,50 @@ class Environment(object):
         pass
 
 
-    def reset(self, seed: int = 0, initial_state=None):
+    @property
+    @abstractmethod
+    def action_space(self) -> gym.spaces.Dict:
         pass
 
 
-    def step(self, action: int) -> Tuple[Any, float, bool, Dict[Any, Any]]:
+    @property
+    @abstractmethod
+    def observation_space(self) -> gym.spaces.Dict:
         pass
 
 
-    def render(self):
+    @ abstractmethod
+    def reset(
+        self,
+        seed: int = 0,
+        initial_state=None,
+        options: Dict[str, Any] | None = None
+    ) -> Tuple[ObsDict, InfoDict]:
         pass
 
 
-    def get_opponent(self):
+    @abstractmethod
+    def step(
+            self,
+            action: ActionDict | ActionType
+    ) -> Tuple[ObsDict, RewardDict, TerminatedDict, InfoDict]:
+        raise NotImplementedError()
+
+
+    @abstractmethod
+    def render(self) -> None:
         pass
 
 
-    def get_opponent_value(self, value):
+    @abstractmethod
+    def close(self) -> None:
         pass
+    
+
+    # def get_opponent(self):
+    #     pass
+
+
+    # def get_opponent_value(self, value):
+    #     pass
+

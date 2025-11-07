@@ -59,6 +59,16 @@ class Backend():
         raise NotImplementedError
     
 
+    @staticmethod
+    def empty(shape, dtype):
+        raise NotImplementedError
+    
+
+    @staticmethod
+    def empty_like(array):
+        raise NotImplementedError
+    
+
 class NumpyBackend(Backend):
 
     @staticmethod
@@ -74,7 +84,7 @@ class NumpyBackend(Backend):
         return None if array is None else torch.from_numpy(array)
     
 
-    @staticmethod
+    @classmethod
     def convert_to_backend(cls, array):
         return cls.to_numpy(array)
 
@@ -101,6 +111,16 @@ class NumpyBackend(Backend):
     @staticmethod
     def randint(low, high, size):
         return np.random.randint(low, high, size)
+    
+
+    @staticmethod
+    def empty(shape, dtype):
+        return np.empty(shape=shape, dtype=dtype)
+    
+
+    @staticmethod
+    def empty_like(array):
+        return np.empty_like(array)
 
 
 
@@ -120,7 +140,7 @@ class TorchBackend(Backend):
         return array
     
 
-    @staticmethod
+    @classmethod
     def convert_to_backend(cls, array):
         return cls.to_torch(array)
 
@@ -143,3 +163,18 @@ class TorchBackend(Backend):
     @staticmethod
     def shape(arr: torch.Tensor) -> Tuple:
         return arr.size()
+    
+
+    @staticmethod
+    def empty(shape, dtype):
+        return torch.empty(shape=shape, dtype=dtype)
+    
+
+    @staticmethod
+    def empty_like(array):
+        return torch.empty_like(array)
+    
+
+    @staticmethod
+    def randint(low, high, size):
+        return torch.randint(low, high, size)

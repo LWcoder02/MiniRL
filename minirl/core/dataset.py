@@ -1,8 +1,10 @@
 from __future__ import annotations
-from typing import Tuple
+from typing import Tuple, Dict
+import numpy as np
+import torch
+from abc import abstractmethod
 
 from minirl.core.serialization import Serialization
-from minirl.core.datasets.numpy_dataset import NumpyDataset
 from .backend import Backend
 from minirl.core.environment import EnvironmentInfo
 from minirl.core.agent import AgentInfo
@@ -34,34 +36,26 @@ class DatasetInfo(Serialization):
 
 
 class Dataset(Serialization):
-    def __init__(self, dataset_info: DatasetInfo, num_steps: int = None, num_episodes: int = None):
+    def __init__(self,
+                 dataset_info: DatasetInfo,
+                 field_specs: Dict[str, Tuple[Tuple[int, ...], np.dtype | torch.dtype]],
+                 base_shape: Tuple[int, ...]):
         
         self._dataset_info = dataset_info
         self._backend: Backend = Backend.get_backend(backend_type=self._dataset_info.backend)
 
 
-        if num_steps is not None:
-            num_samples = num_steps
-        else:
-            horizon = self._dataset_info.horizon
-            num_samples = horizon * num_episodes
+        self._base_shape = base_shape
+        self._field_specs = field_specs
+        self._field_names = list(field_specs.keys())
+        self._dataset: Dict[str, np.ndarray | torch.Tensor] = {}
 
-        base_shape = (num_samples,)
-        state_shape = base_shape + self._dataset_info.state_shape
-        action_shape = base_shape # + self._dataset_info.action_shape, has to be checked for some environments
-        reward_shape = base_shape
+        for field_name, (shape, dtype) in field_specs.items():
+            self._dataset[field_name] = self._backend.empty(shape=shape, dtype=dtype)
 
+        self._info = {}
 
-        if self._dataset_info.backend == 'numpy':
-            self._dataset = NumpyDataset(state_shape=state_shape, action_shape=action_shape, reward_shape=reward_shape,
-                                         flag_shape=base_shape)
-        else:
-            raise ValueError("Only numpy is as dataset type supported")
-        # elif self._dataset_info.backend == 'torch':
-        #     self._dataset = ...
-        # else:
-        #     self._dataset = ...
-
+        self._len = 0
         super().__init__()
 
 
@@ -71,11 +65,16 @@ class Dataset(Serialization):
     
 
     def __len__(self):
-        return len(self._dataset)
+        return self._len
     
 
     def __getitem__(self, idx):
-        return self._dataset[idx]
+        items = []
+        for field_name in self._field_names:
+            items.append(self._dataset[field_name][idx])
+
+        # items.append(self._info[idx])
+        return tuple(items)
     
 
     @classmethod
@@ -92,10 +91,12 @@ class Dataset(Serialization):
     
 
     @classmethod
+    @abstractmethod
     def generate(cls, environment_info, num_steps = None, num_episodes = None):
-        dataset_info: DatasetInfo = DatasetInfo.create_dataset_info(environment_info=environment_info)
-        return cls(dataset_info, num_steps, num_episodes)    
-
+        # dataset_info: DatasetInfo = DatasetInfo.create_dataset_info(environment_info=environment_info)
+        # return cls(dataset_info, num_steps, num_episodes)    
+        raise NotImplementedError
+    
 
     def get_view(self, index, copy: bool = False):
         dataset = self.create_new_empty_dataset(dataset=self)
@@ -103,8 +104,13 @@ class Dataset(Serialization):
         return dataset
 
 
-    def append(self, sample):
-        self._dataset.append(*sample)
+    def append(self, **kwargs):
+        i = self._len
+
+        for name, value in kwargs.items():
+            self._dataset[name][i] = value
+
+        self._len += 1
 
 
     def clear(self):

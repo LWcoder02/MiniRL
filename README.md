@@ -1,1 +1,1 @@
-# MiniRL: A small Reinforcement Learning Framework inspired by Mushroom-RL
+# MiniRL: A small Deep Reinforcement Learning Framework for Single- and Multi-Agent Training
